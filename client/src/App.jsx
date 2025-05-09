@@ -1,11 +1,12 @@
 import Router from './router/router'
 import './App.css'
 import { Toaster } from 'react-hot-toast'
-
+import Navbar from './components/Navbar'
 function App() {
 
   return (
     <>
+    <Navbar/>
       <Toaster toastOptions={{
     success: {
       iconTheme: {
