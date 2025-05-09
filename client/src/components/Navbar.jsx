@@ -3,7 +3,7 @@ import React from "react";
 const Navbar = ({ usercode }) => {
   return (
     <nav
-      className="navbar navbar-light bg-white shadow-sm"
+      className="navbar navbar-light bg-dark shadow-sm"
       style={{ padding: "10px 20px" }}
     >
       <div className="container-fluid d-flex align-items-center">
