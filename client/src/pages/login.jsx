@@ -3,85 +3,90 @@ import axios from "axios";
 import { useNavigate } from "react-router";
 
 const Login = () => {
-  const [usercode, setusercode] = useState("");
-  const navigate=useNavigate();
+  const [usercode, setUsercode] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const inputRef = useRef(null);
 
   useEffect(() => {
     inputRef.current.focus();
   }, []);
 
-  const handleinputchange = (e) => {
-    setusercode(e.target.value);
+  const handleInputChange = (e) => {
+    setUsercode(e.target.value);
   };
 
-  const handlesubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(usercode);
-    console.log("submit");
+    if (!usercode.trim()) {
+      setError("Please enter your code.");
+      return;
+    }
+
+    setError("");
+    setLoading(true);
+
     try {
-      const result = await axios.post("http://localhost:5050/api/login", {
-        usercode: usercode
+      const res = await axios.post("http://localhost:5050/api/login", {
+        usercode,
       });
-      const id=result.data.user._id;
-      console.log('result',result);
-      console.log('result user',result.data.user);
+      const id = res.data.user._id;
       navigate(`/displayNotes/${id}`);
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      setError("Invalid code. Please try again.");
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div
-      className="container-fluid bg-secondary-subtle d-flex align-items-center p-5"
-      style={{ minHeight: "100vh" }}
-    >
-      <div className="row container-fluid bg-dark p-5 rounded-4">
-        <div
-          className="bg-dark col-md-7 col-sm-12 p-3 pe-5 "
-          style={{ height: "50vh" }}
-        >
-          <p
-            className="display-2 fw-bold my-5 "
-            style={{ color: "rgb(80, 207, 169)",fontFamily:"'Lexend Giga',sans-serif"}}
-          >
+    <div className="container-fluid d-flex align-items-center justify-content-center bg-secondary-subtle" style={{ minHeight: "100vh" }}>
+      <div className="row w-100 m-2 m-md-5 bg-dark rounded-4 shadow overflow-hidden">
+        
+        {/* Left section */}
+        <div className="col-md-6 d-flex flex-column justify-content-center p-4 text-light">
+          <h1 className="fw-bold mb-4" style={{ color: "rgb(80, 207, 169)", fontFamily: "'Lexend Giga', sans-serif" }}>
             CopyPal
-          </p>
-          <p className="fs-4 text-light mb-4">
-            A sleek and minimalistic online notepad for seamless text editing
-            and sharing. Access your notes from anywhere and collaborate
-            effortlessly without the hassle of accounts or downloads"
+          </h1>
+          <p className="fs-5 lh-lg">
+            A sleek and minimalistic online notepad for seamless text editing and sharing.
+            Access your notes from anywhere and collaborate effortlessly — no sign-ups needed.
           </p>
         </div>
-        <form
-          onSubmit={handlesubmit}
-          className="row bg-light col-md-5 col-sm-12 rounded p-4 d-flex flex-column justify-content-center align-items-center bg-light"
-          style={{ height: "65vh" }}
-        >
-          <div className=" fs-3 fw-semibold text-dark mb-4 px-sm-4 px-lg-5" style={{}}>
-            Enter the code to access your Notes
-          </div>
-          <div className="row d-flex align-items-center justify-content-center gap-sm-0 gap-sm-4">
-            <div className="row col-lg-8 col-sm-12">
+
+        {/* Right section */}
+        <div className="col-md-6 bg-light d-flex flex-column justify-content-center p-5">
+          <form onSubmit={handleSubmit} className="w-100">
+            <h4 className="fw-semibold mb-4 text-center">Access Your Notes</h4>
+
+            <div className="mb-3">
               <input
-                type="text"
-                placeholder="Enter code here"
                 ref={inputRef}
+                type="text"
+                className="form-control form-control-lg"
+                placeholder="Enter your code"
                 value={usercode}
-                onChange={handleinputchange}
-                className="text-secondary form-control-lg mt-3"
+                onChange={handleInputChange}
               />
             </div>
-            <button
-              type="submit"
-              className="btn border-success btn-outline text-light col-lg-3 col-sm-6 p-2 fs-5 mt-3"
-              style={{ backgroundColor: "rgb(80, 207, 169)" }}
-            >
-              Submit
-            </button>
-          </div>
-        </form>
+
+            {error && <div className="text-danger text-center mb-3">{error}</div>}
+
+            <div className="text-center">
+              <button
+                type="submit"
+                className="btn btn-lg text-light w-100"
+                style={{ backgroundColor: "rgb(80, 207, 169)" }}
+                disabled={loading}
+              >
+                {loading ? "Loading..." : "Submit"}
+              </button>
+            </div>
+          </form>
+        </div>
+
       </div>
     </div>
   );
